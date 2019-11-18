@@ -6,20 +6,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 micro_files = [
-    'microelectronics_nt_microelectronics_t0.csv', 
+    'microelectronics_nt_microelectronics_t0.csv',
     'microelectronics_nt_microelectronics_t1.csv']
 
 flag_particle = {
-    'e-': '1', 
-    'proton': '2', 
+    'e-': '1',
+    'proton': '2',
     'GenericIon': '3'}
 
 flag_process = {
-    'msc': '10', 
-    'e-_G4MicroElecElastic': '11', 
-    'e-_G4MicroElecInelastic': '12', 
-    'eCapture': '13', 
-    'p_G4MicroElecInelastic': '14', 
+    'msc': '10',
+    'e-_G4MicroElecElastic': '11',
+    'e-_G4MicroElecInelastic': '12',
+    'eCapture': '13',
+    'p_G4MicroElecInelastic': '14',
     'ion_G4MicroElecInelastic': '15',
     'hIoni': '16',
     'eIoni': '17'}
@@ -54,10 +54,12 @@ process_count = {
 positions = []
 energy_deposition_depth = []
 step_length_tracks = []
+secondaries = []
 
 pp = pprint.PrettyPrinter(indent=4)
 
 fig = plt.figure()
+
 
 def main():
     for micro_file in micro_files:
@@ -71,6 +73,7 @@ def main():
                     tracking_position(row)
                     track_energy_deposition(row)
                     track_step_length(row)
+                    track_secondaries(row)
 
     print('Summary of simulation')
     print('Particle event count')
@@ -83,7 +86,10 @@ def main():
     # graph_energy_deposition(energy_deposition_depth)
     print('Step length of electrons')
     graph_step_length(step_length_tracks)
-    
+    print('Secondaries')
+    graph_secondaries(secondaries)
+    pp.pprint(secondaries)
+
 
 def count_particle(row):
     if row[particle_col] == flag_particle['e-']:
@@ -92,6 +98,7 @@ def count_particle(row):
         particle_count['proton'] += 1
     elif row[particle_col] == flag_particle['GenericIon']:
         particle_count['ion'] += 1
+
 
 def count_process(row):
     if row[process_col] == flag_process['msc']:
@@ -111,9 +118,11 @@ def count_process(row):
     elif row[process_col] == flag_process['eIoni']:
         process_count['e_ionisation'] += 1
 
+
 def tracking_position(row):
     pos = (row[x_col], row[y_col], row[z_col], row[particle_col])
     positions.append(pos)
+
 
 def graph_positions(positions):
     ax = plt.subplot(221, projection='3d')
@@ -124,7 +133,7 @@ def graph_positions(positions):
     for pos in positions:
         particle_type = pos[3]
 
-        #remove if z is below zero, outside
+        # remove if z is below zero, outside
         if (float(pos[2]) >= 0):
             if particle_type == flag_particle['e-']:
                 elec_pos[0].append(float(pos[0]))
@@ -143,7 +152,7 @@ def graph_positions(positions):
     ax.scatter(elec_pos[0], elec_pos[1], elec_pos[2], marker='o')
     ax.scatter(proton_pos[0], proton_pos[1], proton_pos[2], marker='^')
     ax.scatter(ion_pos[0], ion_pos[1], ion_pos[2], marker='.')
-    
+
     ax.set_title('Position of energy interaction')
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -151,10 +160,12 @@ def graph_positions(positions):
 
     # plt.show()
 
+
 def track_energy_deposition(row):
     # only worry about energy deposited from electrons
     if (row[particle_col] == flag_particle['e-']):
         energy_deposition_depth.append((row[z_col], row[total_energy_col]))
+
 
 def graph_energy_deposition(energy_deposition_depth):
     depth = []
@@ -173,12 +184,15 @@ def graph_energy_deposition(energy_deposition_depth):
     ax2.set_xlabel('Depth (nm)')
     ax2.set_ylabel('Energy (eV)')
 
+
 def track_step_length(row):
     # only consider electrons
     # comparison of step length and depth
     # comparison of step length and energy deposition
     if row[particle_col] == flag_particle['e-']:
-        step_length_tracks.append((row[z_col], row[step_length_col], row[total_energy_col]))
+        step_length_tracks.append(
+            (row[z_col], row[step_length_col], row[total_energy_col]))
+
 
 def graph_step_length(step_length_tracks):
     depths = []
@@ -191,7 +205,7 @@ def graph_step_length(step_length_tracks):
         if depth > 0:
             step_length = float(step_length_track[1])/(1*10**9)
             energy_deposition = float(step_length_track[2])
-            
+
             depths.append(depth)
             step_lengths.append(step_length)
             energy_depositions.append(energy_deposition)
@@ -210,15 +224,63 @@ def graph_step_length(step_length_tracks):
 
     # ax4 = plt.subplot(224)
     # ax4.scatter(step_lengths, energy_depositions)
-    # ax4.set_title('Energy deposition for different step length')    
+    # ax4.set_title('Energy deposition for different step length')
     # ax4.set_xlabel('Step length (nm)')
     # ax4.set_ylabel('Energy deposited (eV)')
     # plt.show()
-    plt.scatter(step_lengths, energy_depositions)
-    plt.title('Energy deposition for different step length')    
-    plt.xlabel('Step length (nm)')
-    plt.ylabel('Energy deposited (eV)')
+    # plt.scatter(step_lengths, energy_depositions)
+    # plt.title('Energy deposition for different step length')
+    # plt.xlabel('Step length (nm)')
+    # plt.ylabel('Energy deposited (eV)')
+    # plt.show()
+
+
+def track_secondaries(row):
+    if row[particle_col] == flag_particle['e-'] and row[process_col] == flag_process['eIoni']:
+        secondaries.append(row)
+
+
+def graph_secondaries(secondaries):
+    ax = plt.subplot(211, projection='3d')
+
+    x_pos = []
+    y_pos = []
+    z_pos = []
+    energies = []
+    step_length = []
+    for secondary in secondaries:
+        # remove if z is below zero, outside
+        if (float(secondary[z_col]) >= 0):
+            energies.append(float(secondary[total_energy_col]))
+            x_pos.append(float(secondary[x_col]))
+            y_pos.append(float(secondary[y_col]))
+            z_pos.append(float(secondary[z_col]))
+            step_length.append(float(secondary[step_length_col]))
+
+    # graph different particle positions
+    ax.scatter(x_pos, y_pos, z_pos, marker='o')
+
+    ax.set_title('Position of energy interaction')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    ax2 = plt.subplot(212)
+
+    ax2.scatter(z_pos, energies)
+    ax2.set_title('Total energy of secondaries')
+
     plt.show()
+
+    ax = plt.subplot(111)
+
+    ax.set_title('Step length throughout depth')
+    ax.set_xlabel('Depth (nm)')
+    ax.set_ylabel('Step length (nm)')
+    ax.scatter(z_pos, step_length)
+
+    plt.show()
+
 
 if __name__ == '__main__':
     main()
