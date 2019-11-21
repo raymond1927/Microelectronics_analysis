@@ -1,0 +1,12 @@
+#class tools::wcsv::ntuple
+#title physics
+#separator 44
+#vector_separator 59
+#column double flagParticle
+#column double flagProcess
+#column double x
+#column double y
+#column double z
+#column double totalEnergyDeposit
+#column double stepLength
+#column double kineticEnergyDifference

@@ -4,10 +4,47 @@ import pprint
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
+from statistics import mean
+
+# micro_files = [
+#     'microelectronics_nt_microelectronics_t0.csv',
+#     'microelectronics_nt_microelectronics_t1.csv']
+
+# micro_files = [
+#     '18kt0.csv',
+#     '18kt1.csv']
+
+# micro_files = [
+#     '15kt0.csv',
+#     '15kt1.csv']
+
+# micro_files = [
+#     '20kt0.csv',
+#     '20kt1.csv']
+
+# micro_files = [
+#     '25kt0.csv',
+#     '25kt1.csv']
+
+# micro_files = [
+#     '10kt0.csv',
+#     '10kt1.csv']
+
+# micro_files = [
+#     '13kt0.csv',
+#     '13kt1.csv']
+
+# micro_files = [
+#     '12kt0.csv',
+#     '12kt1.csv']
+
+# micro_files = [
+#     '5kt0.csv',
+#     '5kt1.csv']
 
 micro_files = [
-    'microelectronics_nt_microelectronics_t0.csv',
-    'microelectronics_nt_microelectronics_t1.csv']
+    '30kt0.csv',
+    '30kt1.csv']
 
 flag_particle = {
     'e-': '1',
@@ -81,14 +118,14 @@ def main():
     print('Process event count')
     pp.pprint(process_count)
     print('Position which events occurred')
-    # graph_positions(positions)
+    graph_positions(positions)
     print('Energy deposited in depth')
     # graph_energy_deposition(energy_deposition_depth)
     print('Step length of electrons')
     graph_step_length(step_length_tracks)
     print('Secondaries')
     graph_secondaries(secondaries)
-    pp.pprint(secondaries)
+    # pp.pprint(secondaries)
 
 
 def count_particle(row):
@@ -134,19 +171,19 @@ def graph_positions(positions):
         particle_type = pos[3]
 
         # remove if z is below zero, outside
-        if (float(pos[2]) >= 0):
-            if particle_type == flag_particle['e-']:
-                elec_pos[0].append(float(pos[0]))
-                elec_pos[1].append(float(pos[1]))
-                elec_pos[2].append(float(pos[2]))
-            elif particle_type == flag_particle['proton']:
-                proton_pos[0].append(float(pos[0]))
-                proton_pos[1].append(float(pos[1]))
-                proton_pos[2].append(float(pos[2]))
-            elif particle_type == flag_particle['GenericIon']:
-                ion_pos[0].append(float(pos[0]))
-                ion_pos[1].append(float(pos[1]))
-                ion_pos[2].append(float(pos[2]))
+        # if (float(pos[2]) >= 0):
+        if particle_type == flag_particle['e-']:
+            elec_pos[0].append(float(pos[0]))
+            elec_pos[1].append(float(pos[1]))
+            elec_pos[2].append(float(pos[2]))
+        elif particle_type == flag_particle['proton']:
+            proton_pos[0].append(float(pos[0]))
+            proton_pos[1].append(float(pos[1]))
+            proton_pos[2].append(float(pos[2]))
+        elif particle_type == flag_particle['GenericIon']:
+            ion_pos[0].append(float(pos[0]))
+            ion_pos[1].append(float(pos[1]))
+            ion_pos[2].append(float(pos[2]))
 
     # graph different particle positions
     ax.scatter(elec_pos[0], elec_pos[1], elec_pos[2], marker='o')
@@ -158,18 +195,19 @@ def graph_positions(positions):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
 
-    # plt.show()
+    plt.show()
 
 
 def track_energy_deposition(row):
     # only worry about energy deposited from electrons
     if (row[particle_col] == flag_particle['e-']):
-        energy_deposition_depth.append((row[z_col], row[total_energy_col]))
+        energy_deposition_depth.append((row[z_col], row[total_energy_col], row[kinetic_energy_col]))
 
 
 def graph_energy_deposition(energy_deposition_depth):
     depth = []
     energy = []
+
     for depth_energy in energy_deposition_depth:
         depth_pos = float(depth_energy[0])
         if depth_pos > 0:
@@ -248,14 +286,19 @@ def graph_secondaries(secondaries):
     z_pos = []
     energies = []
     step_length = []
+    kin_energies = []
     for secondary in secondaries:
         # remove if z is below zero, outside
-        if (float(secondary[z_col]) >= 0):
+        if (float(secondary[z_col]) >= 0 or True):
             energies.append(float(secondary[total_energy_col]))
             x_pos.append(float(secondary[x_col]))
             y_pos.append(float(secondary[y_col]))
             z_pos.append(float(secondary[z_col]))
             step_length.append(float(secondary[step_length_col]))
+
+        kin_energies.append(float(secondary[kinetic_energy_col]))
+
+    print("Average of the list =", mean(kin_energies)) 
 
     # graph different particle positions
     ax.scatter(x_pos, y_pos, z_pos, marker='o')
@@ -267,19 +310,21 @@ def graph_secondaries(secondaries):
 
     ax2 = plt.subplot(212)
 
-    ax2.scatter(z_pos, energies)
-    ax2.set_title('Total energy of secondaries')
+    ax2.scatter(z_pos, kin_energies)
+    ax2.set_title('Energy transferred to secondaries')
+    ax2.set_ylabel('Kinetic energy transferred (eV)')
+    ax2.set_xlabel('Depth (nm)')
 
     plt.show()
 
-    ax = plt.subplot(111)
+    # ax = plt.subplot(111)
 
-    ax.set_title('Step length throughout depth')
-    ax.set_xlabel('Depth (nm)')
-    ax.set_ylabel('Step length (nm)')
-    ax.scatter(z_pos, step_length)
+    # ax.set_title('Step length throughout depth')
+    # ax.set_xlabel('Depth (nm)')
+    # ax.set_ylabel('Step length (nm)')
+    # ax.scatter(z_pos, step_length)
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':
