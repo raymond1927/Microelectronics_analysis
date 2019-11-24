@@ -46,6 +46,10 @@ micro_files = [
     '30kt0.csv',
     '30kt1.csv']
 
+# micro_files = [
+#     '2kt0.csv',
+#     '2kt1.csv']
+
 flag_particle = {
     'e-': '1',
     'proton': '2',
