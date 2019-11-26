@@ -205,8 +205,6 @@ def main():
             mean_pos.append(mean(pos) + 2000)
         else:
             mean_pos.append(0)
-    mean_pos[9] = -1750 + 2000
-    mean_pos[19] = -1300 + 2000
     plt.scatter(energies, mean_pos)
     plt.title('Average depth of secondary generation')
     plt.xlabel('Particle beam Energy (keV)')
