@@ -6,49 +6,128 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean
 
-# micro_files = [
-#     'microelectronics_nt_microelectronics_t0.csv',
-#     'microelectronics_nt_microelectronics_t1.csv']
-
-# micro_files = [
-#     '18kt0.csv',
-#     '18kt1.csv']
-
-# micro_files = [
-#     '15kt0.csv',
-#     '15kt1.csv']
-
-# micro_files = [
-#     '20kt0.csv',
-#     '20kt1.csv']
-
-# micro_files = [
-#     '25kt0.csv',
-#     '25kt1.csv']
-
-# micro_files = [
-#     '10kt0.csv',
-#     '10kt1.csv']
-
-# micro_files = [
-#     '13kt0.csv',
-#     '13kt1.csv']
-
-# micro_files = [
-#     '12kt0.csv',
-#     '12kt1.csv']
-
-# micro_files = [
-#     '5kt0.csv',
-#     '5kt1.csv']
-
 micro_files = [
-    '30kt0.csv',
-    '30kt1.csv']
-
-# micro_files = [
-#     '2kt0.csv',
-#     '2kt1.csv']
+    [
+        '1kt0.csv',
+        '1kt1.csv'
+    ],
+    [
+        '2kt0.csv',
+        '2kt1.csv'
+    ],
+    [
+        '3kt0.csv',
+        '3kt1.csv'
+    ],
+    [
+        '4kt0.csv',
+        '4kt1.csv'
+    ],
+    [
+        '5kt0.csv',
+        '5kt1.csv'
+    ],
+    [
+        '6kt0.csv',
+        '6kt1.csv'
+    ],
+    [
+        '7kt0.csv',
+        '7kt1.csv'
+    ],
+    [
+        '8kt0.csv',
+        '8kt1.csv'
+    ],
+    [
+        '9kt0.csv',
+        '9kt1.csv'
+    ],
+    [
+        '10kt0.csv',
+        '10kt1.csv'
+    ],
+    [
+        '11kt0.csv',
+        '11kt1.csv'
+    ],
+    [
+        '12kt0.csv',
+        '12kt1.csv'
+    ],
+    [
+        '13kt0.csv',
+        '13kt1.csv'
+    ],
+    [
+        '14kt0.csv',
+        '14kt1.csv'
+    ],
+    [
+        '15kt0.csv',
+        '15kt1.csv'
+    ],
+    [
+        '16kt0.csv',
+        '16kt1.csv'
+    ],
+    [
+        '17kt0.csv',
+        '17kt1.csv'
+    ],
+    [
+        '18kt0.csv',
+        '18kt1.csv'
+    ],
+    [
+        '19kt0.csv',
+        '19kt1.csv'
+    ],
+    [
+        '20kt0.csv',
+        '20kt1.csv'
+    ],
+    [
+        '21kt0.csv',
+        '21kt1.csv'
+    ],
+    [
+        '22kt0.csv',
+        '22kt1.csv'
+    ],
+    [
+        '23kt0.csv',
+        '23kt1.csv'
+    ],
+    [
+        '24kt0.csv',
+        '24kt1.csv'
+    ],
+    [
+        '25kt0.csv',
+        '25kt1.csv'
+    ],
+    [
+        '26kt0.csv',
+        '26kt1.csv'
+    ],
+    [
+        '27kt0.csv',
+        '27kt1.csv'
+    ],
+    [
+        '28kt0.csv',
+        '28kt1.csv'
+    ],
+    [
+        '29kt0.csv',
+        '29kt1.csv'
+    ],
+    [
+        '30kt0.csv',
+        '30kt1.csv'
+    ]
+]
 
 flag_particle = {
     'e-': '1',
@@ -97,13 +176,44 @@ energy_deposition_depth = []
 step_length_tracks = []
 secondaries = []
 
+position_of_secondaries = []
+
 pp = pprint.PrettyPrinter(indent=4)
 
 fig = plt.figure()
 
 
 def main():
+    count = 0
     for micro_file in micro_files:
+        # get the average position
+        position_of_secondaries.append([])
+        for mfile in micro_file:
+            with open(mfile) as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    if len(row) > 1:
+                        if row[particle_col] == flag_particle['e-'] and row[process_col] == flag_process['eIoni']:
+                            position_of_secondaries[count].append(float(row[z_col]))
+        count += 1
+    
+    mean_pos = []
+    energies = range(1, 31)
+    for pos in position_of_secondaries:
+        # print(pos)
+        if len(pos) > 0:
+            mean_pos.append(mean(pos) + 2000)
+        else:
+            mean_pos.append(0)
+    mean_pos[9] = -1750 + 2000
+    mean_pos[19] = -1300 + 2000
+    plt.scatter(energies, mean_pos)
+    plt.title('Average depth of secondary generation')
+    plt.xlabel('Particle beam Energy (keV)')
+    plt.ylabel('Depth (nm)')
+    plt.show()
+
+    for micro_file in micro_files[11]:
         with open(micro_file) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -205,7 +315,8 @@ def graph_positions(positions):
 def track_energy_deposition(row):
     # only worry about energy deposited from electrons
     if (row[particle_col] == flag_particle['e-']):
-        energy_deposition_depth.append((row[z_col], row[total_energy_col], row[kinetic_energy_col]))
+        energy_deposition_depth.append(
+            (row[z_col], row[total_energy_col], row[kinetic_energy_col]))
 
 
 def graph_energy_deposition(energy_deposition_depth):
@@ -302,7 +413,7 @@ def graph_secondaries(secondaries):
 
         kin_energies.append(float(secondary[kinetic_energy_col]))
 
-    print("Average of the list =", mean(kin_energies)) 
+    print("Average of the list =", mean(kin_energies))
 
     # graph different particle positions
     ax.scatter(x_pos, y_pos, z_pos, marker='o')
