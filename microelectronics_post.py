@@ -222,10 +222,8 @@ def main():
             mean_energy.append(sum(energies_at)/(eng*1000*1000))
         else:
             mean_energy.append(0)
-    mean_energy[9] = 0.055
-    mean_energy[19] = 0.084
     plt.scatter(energies, mean_energy)
-    plt.title('Total of energy transferred to secondaries over energy of incident particles')
+    plt.title('Percentage of energy transferred to secondaries within depletion region')
     plt.xlabel('Particle beam energy (keV)')
     plt.ylabel('Percentage of energy transferred')
     plt.show()
