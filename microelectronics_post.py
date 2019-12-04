@@ -229,7 +229,7 @@ def main():
     plt.show()
 
 
-    for micro_file in micro_files[11]:
+    for micro_file in micro_files[20]:
         with open(micro_file) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -250,7 +250,7 @@ def main():
     print('Position which events occurred')
     graph_positions(positions)
     print('Energy deposited in depth')
-    # graph_energy_deposition(energy_deposition_depth)
+    graph_energy_deposition(energy_deposition_depth)
     print('Step length of electrons')
     graph_step_length(step_length_tracks)
     print('Secondaries')
@@ -379,29 +379,29 @@ def graph_step_length(step_length_tracks):
             step_lengths.append(step_length)
             energy_depositions.append(energy_deposition)
 
-    # ax3 = plt.subplot(223)
-    # ax3.scatter(depths, step_lengths)
-    # ax3.set_title('Step length at depth')
-    # ax3.set_xlabel('Depth (um)')
-    # ax3.set_ylabel('Step length (nm)')
-    # plt.show()
-    # plt.scatter(depths, step_lengths)
-    # plt.title('Step length throughout depth')
-    # plt.xlabel('Depth (nm)')
-    # plt.ylabel('Step length (nm)')
-    # plt.show()
+    ax3 = plt.subplot(223)
+    ax3.scatter(depths, step_lengths)
+    ax3.set_title('Step length at depth')
+    ax3.set_xlabel('Depth (um)')
+    ax3.set_ylabel('Step length (nm)')
+    plt.show()
+    plt.scatter(depths, step_lengths)
+    plt.title('Step length throughout depth')
+    plt.xlabel('Depth (nm)')
+    plt.ylabel('Step length (nm)')
+    plt.show()
 
-    # ax4 = plt.subplot(224)
-    # ax4.scatter(step_lengths, energy_depositions)
-    # ax4.set_title('Energy deposition for different step length')
-    # ax4.set_xlabel('Step length (nm)')
-    # ax4.set_ylabel('Energy deposited (eV)')
-    # plt.show()
-    # plt.scatter(step_lengths, energy_depositions)
-    # plt.title('Energy deposition for different step length')
-    # plt.xlabel('Step length (nm)')
-    # plt.ylabel('Energy deposited (eV)')
-    # plt.show()
+    ax4 = plt.subplot(224)
+    ax4.scatter(step_lengths, energy_depositions)
+    ax4.set_title('Energy deposition for different step length')
+    ax4.set_xlabel('Step length (nm)')
+    ax4.set_ylabel('Energy deposited (eV)')
+    plt.show()
+    plt.scatter(step_lengths, energy_depositions)
+    plt.title('Energy deposition for different step length')
+    plt.xlabel('Step length (nm)')
+    plt.ylabel('Energy deposited (eV)')
+    plt.show()
 
 
 def track_secondaries(row):
@@ -448,14 +448,14 @@ def graph_secondaries(secondaries):
 
     plt.show()
 
-    # ax = plt.subplot(111)
+    ax = plt.subplot(111)
 
-    # ax.set_title('Step length throughout depth')
-    # ax.set_xlabel('Depth (nm)')
-    # ax.set_ylabel('Step length (nm)')
-    # ax.scatter(z_pos, step_length)
+    ax.set_title('Step length throughout depth')
+    ax.set_xlabel('Depth (nm)')
+    ax.set_ylabel('Step length (nm)')
+    ax.scatter(z_pos, step_length)
 
-    # plt.show()
+    plt.show()
 
 
 if __name__ == '__main__':
